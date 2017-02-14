@@ -14,5 +14,8 @@
 	<f:entry field="enableCodeCoverageAnalysis" title="${%Enable display of Code Coverage results}">
 		<f:checkbox name="enableCodeCoverageAnalysis" default="${descriptor.defaultEnableCodeCoverageAnalysis}"/>
 	</f:entry>
+	<f:entry field="skipPublish" title="${%Skip publishing of test report}" help="/plugin/mstest/help-skip-publish.html">
+		<f:checkbox name="skipPublish" default="${descriptor.skipPublish}"/>
+	</f:entry>
 
 </j:jelly>

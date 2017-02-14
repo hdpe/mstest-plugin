@@ -47,6 +47,7 @@ public class MSTestPublisher extends Recorder implements Serializable {
     private boolean failOnError = DescriptorImpl.defaultFailOnError;
     private boolean keepLongStdio = DescriptorImpl.defaultKeepLongStdio;
     private boolean enableCodeCoverageAnalysis = DescriptorImpl.defaultEnableCodeCoverageAnalysis;
+    private boolean skipPublish = DescriptorImpl.defaultSkipPublish;
 
     @DataBoundConstructor
     public MSTestPublisher(){
@@ -87,6 +88,10 @@ public class MSTestPublisher extends Recorder implements Serializable {
     public boolean getEnableCodeCoverageAnalysis(){
         return enableCodeCoverageAnalysis;
     }
+    
+    public boolean getSkipPublish() {
+    	return skipPublish;
+    }
 
     @DataBoundSetter
     public final void setFailOnError(boolean failOnError) {
@@ -101,6 +106,11 @@ public class MSTestPublisher extends Recorder implements Serializable {
     @DataBoundSetter
     public final void setEnableCodeCoverageAnalysis(boolean enableCodeCoverageAnalysis) {
         this.enableCodeCoverageAnalysis = enableCodeCoverageAnalysis;
+    }
+    
+    @DataBoundSetter
+    public final void setSkipPublish(boolean skipPublish) {
+    	this.skipPublish = skipPublish;
     }
 
     @Override
@@ -145,7 +155,7 @@ public class MSTestPublisher extends Recorder implements Serializable {
             MSTestTransformer transformer = new MSTestTransformer(resolvedFilePath, new MSTestReportConverter(), listener, failOnError);
             result = build.getWorkspace().act(transformer);
 
-            if (result) {
+            if (result && !skipPublish) {
                 // Run the JUnit test archiver
                 result = recordTestResult(MSTestTransformer.JUNIT_REPORTS_PATH + "/TEST-*.xml", build, listener);
                 build.getWorkspace().child(MSTestTransformer.JUNIT_REPORTS_PATH).deleteRecursive();
@@ -294,6 +304,7 @@ public class MSTestPublisher extends Recorder implements Serializable {
         public static final boolean defaultKeepLongStdio = false;
         public static final boolean defaultFailOnError = true;
         public static final boolean defaultEnableCodeCoverageAnalysis = false;
+        public static final boolean defaultSkipPublish = false;
 
         public DescriptorImpl() {
             super(MSTestPublisher.class);
@@ -336,6 +347,13 @@ public class MSTestPublisher extends Recorder implements Serializable {
             } else if (req.getParameter("enableCodeCoverageAnalysis").equals("on")) {
                 publisher.setEnableCodeCoverageAnalysis(true);
             }
+            
+            if (req.getParameter("skipPublish") == null) {
+            	publisher.setSkipPublish(defaultSkipPublish);
+            } else if (req.getParameter("skipPublish").equals("on")) {
+            	publisher.setSkipPublish(true);
+            }
+            
             return publisher;
         }
     }
